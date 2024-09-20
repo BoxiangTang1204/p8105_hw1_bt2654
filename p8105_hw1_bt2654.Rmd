@@ -1,0 +1,145 @@
+---
+title: "p8105_hw1_bt2654"
+output: github_document
+date: "2024-09-19"
+author: "Boxiang Tang (UNI: bt2654)"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## PROBLEM 1
+
+```{r}
+
+data("penguins", package = "palmerpenguins")
+
+```
+
+**Description**
+
+ * The penguins dataset include totally `r ncol(penguins)` variables
+
+ * For the species variable it contains `r unique(penguins$species)`, 
+the counts for each values are `r summary(penguins$species)`
+
+ * For the island variable it contains `r unique(penguins$island)`,
+the counts for each values are `r summary(penguins$island)`
+
+ * For the bill_length_mm variable, its range is [`r range(penguins$bill_length_mm,na.rm = TRUE)`],
+the its mean value is `r mean(penguins$bill_length_mm,na.rm = TRUE)`
+
+ * For the bill_depth_mm variable, its range is [`r range(penguins$bill_depth_mm,na.rm = TRUE)`],
+the its mean value is `r mean(penguins$bill_depth_mm,na.rm = TRUE)`
+
+ * For the flipper_length_mm variable, its range is [`r range(penguins$flipper_length_mm,na.rm = TRUE)`],
+the its mean value is `r mean(penguins$flipper_length_mm,na.rm = TRUE)`
+
+ * For the body_mass_g variable, its range is [`r range(penguins$body_mass_g,na.rm = TRUE)`],
+the its mean value is `r mean(penguins$body_mass_g,na.rm = TRUE)`
+
+ * For the sex variable it contains `r unique(na.omit(penguins$sex,na.rm = TRUE))`, 
+the counts for each values are `r summary(na.omit(penguins$sex))`
+
+ * For the year variable it contains `r unique(penguins$year)`, 
+ the counts for each values are `r table(penguins$year)`
+
+
+ * Totally speaking, the penguins dataset has `r nrow(penguins)` rows and `r ncol(penguins)` columns
+
+
+
+
+```{r,warning=FALSE}
+
+library(ggplot2)
+
+
+scatterplot_1 <- ggplot(data = penguins, 
+                       aes(x = bill_length_mm, 
+                           y = flipper_length_mm, 
+                           color = species)) +
+                       geom_point() +
+                       labs(title = "Scatterplot of Flipper Length vs Bill Length by Species",
+                            x = "Bill Length (mm)",
+                            y = "Flipper Length (mm)")
+
+
+scatterplot_1
+
+
+ggsave("scatterplot_1.png", 
+       plot = scatterplot_1, 
+       width = 8, 
+       height = 6, 
+       dpi = 300)
+
+
+```
+
+
+
+## Problem 2
+```{r,warning=FALSE,message=FALSE}
+
+library(tidyverse)
+
+
+set.seed(123456789)
+
+
+norm_data = rnorm(10)
+
+
+df_1 <- data.frame(
+  norm_sample = norm_data, # a random sample of size 10 from a standard Normal distribution
+  gt_0 = norm_data > 0, # a logical vector indicating whether elements of the sample are greater than 0
+  char_vec = sample(LETTERS, 
+                    10, 
+                    replace = TRUE), # a character vector of length 10
+  fac_vec = factor(
+    sample(c("low", "medium", "high"), 
+           10, 
+           replace = TRUE
+           )
+    ) # a factor vector of length 10, with 3 different factor “levels”
+)
+
+
+```
+
+
+
+```{r, warning=FALSE}
+
+mean(pull(df_1, norm_sample))
+mean(pull(df_1, gt_0))
+mean(pull(df_1, char_vec))
+mean(pull(df_1, fac_vec))
+
+```
+
+* Notice that for character vector and factor vector,we cannot calculate the mean of those two, but for normal samples and logical vectors (gt_0) we can calculate their means
+
+
+```{r,message=FALSE, warning=FALSE, results='hide'}
+# Before converting
+df_1$gt_0
+df_1$char_vec
+df_1$fac_vec
+
+# After converting
+as.numeric(pull(df_1, gt_0))
+as.numeric(pull(df_1, char_vec))
+as.numeric(pull(df_1, fac_vec))
+
+```
+* Before the converting, the values of the logical vector are "TRUE" and "FALSE", after converting by "as.numeric()", its values change to numeric number 0 & 1, this is because the R processes the Boolean value as the numeric values 0 & 1 (TRUE as 1, FALSE as 0), hence we can directly calculate the mean value of the logical vector and can use as.numeric() directly to convert the Boolean values to numeric values.
+
+
+* For the character vector, its initial values all change to NA, which indicates that as.numeric does not work for character variables (cannot convert them to numeric variables). This phenomenon indicates that unlike Boolean value, R cannot directly process character values as numeric values, hence we cannot directly apply the mean function on character variables. Also in R, we cannot directly convert character values into numeric values by using function "as.numeric()", thus the only output we get after applying the function on character vector is NA.
+
+
+* For the factor vector, after converting by "as.numeric()", its original values - "low", medium" and "high" are all change to numeric numbers 1, 2 and 3. It implies that although unlike Boolean values, R cannot directly process values (or levels) of factor vector as numeric values which means we cannot directly calculate the mean of factor vector by using mean function, R still can refers each value (or level) of factor vector to a specific numeric tags accordingly by using "as.numeric()" function. 
